@@ -35,6 +35,7 @@ const users = {
     ]
 };
 
+// GET
 const findUserByName = (name) => {
     return users["users_list"].filter(
         (user) => user["name"] === name
@@ -43,6 +44,17 @@ const findUserByName = (name) => {
 
 const findUserById = (id) =>
     users["users_list"].find((user) => user["id"] === id);
+
+app.get("/users", (req, res) => {
+    const name = req.query.name;
+    if (name != undefined) {
+        let result = findUserByName(name);
+        result = { users_list: result };
+        res.send(result);
+    } else {
+        res.send(users);
+    }
+});
 
 app.get("/users/:id", (req, res) => {
     const id = req.params["id"]; //or req.params.id
@@ -54,15 +66,16 @@ app.get("/users/:id", (req, res) => {
     }
 });
 
-app.get("/users", (req, res) => {
-    const name = req.query.name;
-    if (name != undefined) {
-        let result = findUserByName(name);
-        result = { users_list: result };
-        res.send(result);
-    } else {
-        res.send(users);
-    }
+// POST
+const addUser = (user) => {
+    users["users_list"].push(user);
+    return user;
+};
+
+app.post("/users", (req, res) => {
+    const userToAdd = req.body;
+    addUser(userToAdd);
+    res.send();
 });
 
 app.listen(port, () => {
