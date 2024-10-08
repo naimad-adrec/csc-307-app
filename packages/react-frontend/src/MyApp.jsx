@@ -14,9 +14,7 @@ function MyApp() {
             fetch(deleteUrl, {method: 'DELETE'})
                 .then(response => {
                     if (response.status === 204) {
-                        const updated = characters.filter((i) => {
-                            return i !== index;
-                        });
+                        const updated = characters.filter((character) => character.id !== userToDelete.id);
                         setCharacters(updated);
                     } else if (response.status === 404) {
                         console.error('User not found, could not delete.');
