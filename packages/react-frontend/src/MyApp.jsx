@@ -6,15 +6,37 @@ function MyApp() {
     const [characters, setCharacters] = useState([]);
 
     function removeOneCharacter(index) {
-        const updated = characters.filter((character, i) => {
-            return i !== index;
-        });
-        setCharacters(updated);
+        const userToDelete = characters[index];
+
+        if (userToDelete && userToDelete.id) {
+            const deleteUrl = `http://localhost:8000/users/${userToDelete.id}`;
+
+            fetch(deleteUrl, {method: 'DELETE'})
+                .then(response => {
+                    if (response.status === 204) {
+                        const updated = characters.filter((i) => {
+                            return i !== index;
+                        });
+                        setCharacters(updated);
+                    } else if (response.status === 404) {
+                        console.error('User not found, could not delete.');
+                    }
+                });
+        } else {
+            console.error('Invalid user data or missing ID.');
+        }
     }
 
     function updateList(person) {
         postUser(person)
-            .then(() => setCharacters([...characters, person]))
+            .then(response => {
+                if (response.status === 201) {
+                    return response.json()
+                } else {
+                    throw new Error('Failed to add user');
+                }
+            })
+            .then(addedPerson => setCharacters([...characters, addedPerson]))
             .catch((error) => {
                 console.log(error);
             })
@@ -41,8 +63,10 @@ function MyApp() {
         fetchUsers()
             .then((res) => res.json())
             .then((json) => setCharacters(json["users_list"]))
-            .catch((error) => { console.log(error); });
-    }, [] );
+            .catch((error) => {
+                console.log(error);
+            });
+    }, []);
 
     return (
         <div className="container">
@@ -50,7 +74,7 @@ function MyApp() {
                 characterData={characters}
                 removeCharacter={removeOneCharacter}
             />
-            <Form handleSubmit={updateList} />
+            <Form handleSubmit={updateList}/>
         </div>
     );
 }
