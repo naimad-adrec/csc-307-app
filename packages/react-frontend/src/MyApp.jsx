@@ -8,13 +8,13 @@ function MyApp() {
     function removeOneCharacter(index) {
         const userToDelete = characters[index];
 
-        if (userToDelete && userToDelete.id) {
-            const deleteUrl = `http://localhost:8000/users/${userToDelete.id}`;
+        if (userToDelete && userToDelete._id) {
+            const deleteUrl = `http://localhost:8000/users/${userToDelete._id}`;
 
             fetch(deleteUrl, {method: 'DELETE'})
                 .then(response => {
                     if (response.status === 204) {
-                        const updated = characters.filter((character) => character.id !== userToDelete.id);
+                        const updated = characters.filter((character) => character._id !== userToDelete._id);
                         setCharacters(updated);
                     } else if (response.status === 404) {
                         console.error('User not found, could not delete.');
